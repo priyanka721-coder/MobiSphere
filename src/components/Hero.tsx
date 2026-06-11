@@ -54,7 +54,7 @@ export default function Hero({ scrollToSection }: HeroProps) {
 
             {/* Subheading */}
             <p className="text-lg md:text-xl text-slate-300/90 leading-relaxed font-light max-w-2xl">
-              Mobile Shop provides the world\'s premium branded mobiles, high-performance smart devices, drop-tested custom accessories, and 24/7 expert maintenance & repair services under one luxury local showroom.
+              MobiSphere provides the world\'s premium branded mobiles, high-performance smart devices, drop-tested custom accessories, and 24/7 expert maintenance & repair services under one luxury local showroom.
             </p>
 
             {/* Quick value proposition metrics */}

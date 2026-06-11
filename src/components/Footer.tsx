@@ -33,7 +33,7 @@ export default function Footer({ scrollToSection }: FooterProps) {
                 <Smartphone className="w-5 h-5" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">
-                Mobile Shop
+                MobiSphere
               </span>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed font-light">
@@ -121,7 +121,7 @@ export default function Footer({ scrollToSection }: FooterProps) {
 
         {/* Bottom copyright details */}
         <div className="border-t border-slate-900 pt-8 mt-12 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© 2026 Mobile Shop. All Rights Reserved.</p>
+          <p>© 2026 MobiSphere. All Rights Reserved.</p>
           <div className="flex space-x-6">
             <a href="#terms" className="hover:text-slate-400">Terms of Service</a>
             <a href="#privacy" className="hover:text-slate-400">Privacy Policy</a>

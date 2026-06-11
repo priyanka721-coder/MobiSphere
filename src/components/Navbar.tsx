@@ -53,7 +53,7 @@ export default function Navbar({ darkMode, setDarkMode, activeSection, scrollToS
               <Smartphone className="w-5 h-5" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-500 dark:from-blue-400 dark:to-indigo-300 bg-clip-text text-transparent">
-              Mobile Shop
+              MobiSphere
             </span>
           </div>
 

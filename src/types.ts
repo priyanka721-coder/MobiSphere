@@ -1,7 +1,7 @@
 export interface Product {
   id: string;
   name: string;
-  brand: 'Apple' | 'Samsung' | 'OnePlus' | 'Xiaomi' | 'Vivo' | 'Oppo';
+  brand: 'Apple' | 'Samsung' | 'OnePlus' | 'Xiaomi' | 'Vivo' | 'Oppo' | 'Realme';
   description: string;
   price: number;
   originalPrice?: number;

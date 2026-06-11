@@ -52,7 +52,7 @@ export default function WhyChooseUs() {
               Unmatched Value Proposition
             </span>
             <h2 className="text-3xl sm:text-4xl font-black mt-2 text-slate-900 dark:text-white tracking-tight leading-none">
-              Why Smartphone Collectors Choose Mobile Shop
+              Why Smartphone Collectors Choose MobiSphere
             </h2>
           </div>
           <div className="lg:col-span-6">

@@ -68,7 +68,7 @@ export default function Contact() {
             Immediate Direct Assistance
           </span>
           <h2 className="text-3xl sm:text-4xl font-black mt-2 text-slate-900 dark:text-white tracking-tight">
-            Connect With Our Team (Mobile Shop)
+            Connect With Our Team (MobiSphere)
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-4 leading-relaxed font-light">
             Fill out our dynamic feedback form, drop by our physical showroom, dial our support lines, or chat directly via WhatsApp for swift assistance.
@@ -197,7 +197,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Email Box</h4>
-                  <span className="text-base font-extrabold text-slate-850 dark:text-white truncate block max-w-[180px]">info@mobileshop.tech</span>
+                  <span className="text-base font-extrabold text-slate-850 dark:text-white truncate block max-w-[180px]">info@mobisphere.tech</span>
                   <span className="block text-xxs text-slate-400 mt-1 dark:text-slate-500">Fast general queries</span>
                 </div>
               </div>
@@ -275,7 +275,7 @@ export default function Contact() {
                   {/* Physical Pin */}
                   <div className="relative p-2 rounded-xl bg-blue-600 text-white shadow-xl flex items-center space-x-1.5 border border-white/20 select-none cursor-default scale-105">
                     <MapPin className="w-4 h-4 animate-bounce" />
-                    <span className="text-[10px] font-bold uppercase whitespace-nowrap">Mobile Shop</span>
+                    <span className="text-[10px] font-bold uppercase whitespace-nowrap">MobiSphere</span>
                   </div>
                 </div>
 

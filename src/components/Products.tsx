@@ -16,7 +16,7 @@ export default function Products() {
   const [orderComplete, setOrderComplete] = useState(false);
   const [generatedOrderNo, setGeneratedOrderNo] = useState('');
 
-  const brands = ['All', 'Apple', 'Samsung', 'OnePlus', 'Xiaomi', 'Vivo', 'Oppo'];
+  const brands = ['All', 'Apple', 'Samsung', 'OnePlus', 'Xiaomi', 'Vivo', 'Oppo', 'Realme'];
 
   const toggleLike = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();

@@ -51,7 +51,7 @@ export default function About() {
               Leading the Smartphone & IoT Device Revolution
             </h2>
             <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-              At Mobile Shop, we don\'t just sell devices; we connect lives, power dreams, and secure investments. What started as a dedicated repair workshop has expanded into a state-of-the-art interactive electronic showroom and repair hub.
+              At MobiSphere, we don\'t just sell devices; we connect lives, power dreams, and secure investments. What started as a dedicated repair workshop has expanded into a state-of-the-art interactive electronic showroom and repair hub.
             </p>
             <p className="text-base text-slate-605 dark:text-slate-300/90 leading-relaxed">
               Every gadget leaving our catalog goes through rigorous multi-point visual, hardware, and battery health inspections. Our passion is to render absolute peace of mind with authentic customer care and honest local pricing.
