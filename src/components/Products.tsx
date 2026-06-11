@@ -206,11 +206,11 @@ export default function Products() {
                     <div>
                       {product.originalPrice && (
                         <span className="text-xs text-slate-400 dark:text-slate-500 line-through block leading-none">
-                          ${product.originalPrice}
+                          ₹{product.originalPrice.toLocaleString('en-IN')}
                         </span>
                       )}
                       <span className="text-xl font-black text-slate-900 dark:text-white leading-none">
-                        ${product.price}
+                        ₹{product.price.toLocaleString('en-IN')}
                       </span>
                     </div>
 
@@ -273,7 +273,7 @@ export default function Products() {
                     <div className="min-w-0">
                       <span className="text-xxs font-extrabold text-blue-600 dark:text-blue-400 uppercase tracking-widest">{checkoutProduct.brand}</span>
                       <h4 className="text-sm font-bold text-slate-850 dark:text-white truncate">{checkoutProduct.name}</h4>
-                      <p className="text-base font-black text-slate-900 dark:text-white mt-0.5">${checkoutProduct.price}</p>
+                      <p className="text-base font-black text-slate-900 dark:text-white mt-0.5">₹{checkoutProduct.price.toLocaleString('en-IN')}</p>
                     </div>
                   </div>
 
@@ -302,7 +302,7 @@ export default function Products() {
                         required
                         value={customerPhone}
                         onChange={(e) => setCustomerPhone(e.target.value)}
-                        placeholder="+1 (555) 0199"
+                        placeholder="+91 (555) 0199"
                         className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       />
                     </div>
@@ -373,7 +373,7 @@ export default function Products() {
 
                   <div className="mt-8 flex gap-3 w-full">
                     <a
-                      href={`https://wa.me/15550199?text=Hello%20Mobile%20Shop!%20I%20have%20submitted%20order%20hold%3A%20${generatedOrderNo}.%20Please%20verify%20my%20device.`}
+                      href={`https://wa.me/15550199?text=Hello%20MobiSphere!%20I%20have%20submitted%20order%20hold%3A%20${generatedOrderNo}.%20Please%20verify%20my%20device.`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-3.5 rounded-xl shadow-md flex items-center justify-center space-x-1.5"
