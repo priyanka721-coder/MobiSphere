@@ -5,6 +5,7 @@ import FeaturedBrands from './components/FeaturedBrands';
 import About from './components/About';
 import Services from './components/Services';
 import Products from './components/Products';
+import Pouches from './components/Pouches';
 import Portfolio from './components/Portfolio';
 import WhyChooseUs from './components/WhyChooseUs';
 import Testimonials from './components/Testimonials';
@@ -12,6 +13,7 @@ import FAQ from './components/FAQ';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import FloatingWidgets from './components/FloatingWidgets';
+import MobiAIAdvisor from './components/MobiAIAdvisor';
 
 export default function App() {
   const [darkMode, setDarkMode] = useState<boolean>(() => {
@@ -35,7 +37,7 @@ export default function App() {
 
   // Track scroll positions to update active navbar indicators
   useEffect(() => {
-    const sections = ['home', 'about', 'services', 'products', 'portfolio', 'why-us', 'testimonials', 'faq', 'contact'];
+    const sections = ['home', 'about', 'services', 'products', 'mobile-pouches', 'ai-advisor', 'portfolio', 'why-us', 'testimonials', 'faq', 'contact'];
     
     const observerOptions = {
       root: null,
@@ -100,6 +102,12 @@ export default function App() {
 
         {/* Products Showcase Catalog */}
         <Products />
+
+        {/* Premium Mobile Pouches for Girls and Boys */}
+        <Pouches />
+
+        {/* MobiAI Smart Advisor Chat Assistant */}
+        <MobiAIAdvisor />
 
         {/* Portfolio Showroom Gallery Grid */}
         <Portfolio />

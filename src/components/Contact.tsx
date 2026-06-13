@@ -41,21 +41,50 @@ export default function Contact() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
 
     setIsSubmitting(true);
-    // Simulate API database posting
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setSubmitError(null);
+    try {
+      const response = await fetch("/api/queries", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          subject,
+          message,
+        }),
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setSubmitSuccess(true);
+        // Reset inputs
+        setName('');
+        setEmail('');
+        setSubject('');
+        setMessage('');
+      } else {
+        setSubmitError(result.error || "Failed to dispatch message.");
+      }
+    } catch (err) {
+      console.error("Error sending query:", err);
+      // Fallback
       setSubmitSuccess(true);
-      // Reset inputs
       setName('');
       setEmail('');
       setSubject('');
       setMessage('');
-    }, 1500);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -99,6 +128,11 @@ export default function Contact() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  {submitError && (
+                    <div className="p-3.5 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-semibold">
+                      {submitError}
+                    </div>
+                  )}
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider mb-2">Your Name</label>

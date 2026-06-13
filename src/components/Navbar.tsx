@@ -17,6 +17,8 @@ export default function Navbar({ darkMode, setDarkMode, activeSection, scrollToS
     { name: 'About Us', id: 'about' },
     { name: 'Services', id: 'services' },
     { name: 'Products', id: 'products' },
+    { name: 'Mobile Pouches', id: 'mobile-pouches' },
+    { name: 'MobiAI Advisor', id: 'ai-advisor' },
     { name: 'Portfolio', id: 'portfolio' },
     { name: 'Why Choose Us', id: 'why-us' },
     { name: 'Testimonials', id: 'testimonials' },
@@ -82,10 +84,14 @@ export default function Navbar({ darkMode, setDarkMode, activeSection, scrollToS
             {/* Dark Mode Toggle */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="ml-4 p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
+              className="ml-4 p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-all duration-300 active:scale-95 group/theme flex items-center justify-center border border-transparent hover:border-slate-200/50 dark:hover:border-slate-800/50"
               aria-label="Toggle theme"
             >
-              {darkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-indigo-600" />}
+              {darkMode ? (
+                <Sun className="w-5 h-5 text-amber-400 transition-transform duration-500 group-hover/theme:rotate-90 group-hover/theme:scale-110" />
+              ) : (
+                <Moon className="w-5 h-5 text-indigo-600 transition-transform duration-500 group-hover/theme:-rotate-12 group-hover/theme:scale-110" />
+              )}
             </button>
           </div>
 
@@ -93,10 +99,14 @@ export default function Navbar({ darkMode, setDarkMode, activeSection, scrollToS
           <div className="flex items-center lg:hidden space-x-2">
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
+              className="p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-all duration-300 active:scale-95 group/theme flex items-center justify-center border border-transparent hover:border-slate-200/50 dark:hover:border-slate-800/50"
               aria-label="Toggle theme"
             >
-              {darkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-indigo-600" />}
+              {darkMode ? (
+                <Sun className="w-5 h-5 text-amber-400 transition-transform duration-500 group-hover/theme:rotate-90 group-hover/theme:scale-110" />
+              ) : (
+                <Moon className="w-5 h-5 text-indigo-600 transition-transform duration-500 group-hover/theme:-rotate-12 group-hover/theme:scale-110" />
+              )}
             </button>
             
             <button

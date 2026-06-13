@@ -7,6 +7,8 @@
   --font-mono: "JetBrains Mono", monospace;
 }
 
+@variant dark (&:where(.dark, .dark *));
+
 html {
   scroll-behavior: smooth;
 }

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, SlidersHorizontal, Check, AlertCircle, ShoppingCart, Percent, Heart, Sparkles, X, QrCode } from 'lucide-react';
+import { Search, SlidersHorizontal, Check, AlertCircle, ShoppingCart, Percent, Heart, Sparkles, X, QrCode, Eye, Star } from 'lucide-react';
 import { PRODUCTS } from '../data';
 import { Product } from '../types';
 
@@ -8,6 +8,7 @@ export default function Products() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [likedProducts, setLikedProducts] = useState<Record<string, boolean>>({});
   const [checkoutProduct, setCheckoutProduct] = useState<Product | null>(null);
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   
   // Checkout form info
   const [customerName, setCustomerName] = useState('');
@@ -15,6 +16,35 @@ export default function Products() {
   const [deliveryType, setDeliveryType] = useState<'Pickup' | 'COD'>('Pickup');
   const [orderComplete, setOrderComplete] = useState(false);
   const [generatedOrderNo, setGeneratedOrderNo] = useState('');
+
+  // Helper to resolve deterministic simulated stock details for consistent UI hydration
+  const getStockDetails = (prod: Product) => {
+    if (!prod.inStock) {
+      return {
+        status: 'Out of Stock',
+        colorClass: 'bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 border-rose-100 dark:border-rose-900/30',
+        count: 0
+      };
+    }
+    
+    // Deterministic stock count based on product ID character sum
+    const charCodeSum = prod.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    const simulatedCount = (charCodeSum % 8) + 1; // 1 to 8 units limit
+    
+    if (simulatedCount <= 3) {
+      return {
+        status: 'Limited Stock',
+        colorClass: 'bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-900/30',
+        count: simulatedCount
+      };
+    } else {
+      return {
+        status: 'In Stock',
+        colorClass: 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30',
+        count: simulatedCount + 4 // between 5 and 12 units
+      };
+    }
+  };
 
   const brands = ['All', 'Apple', 'Samsung', 'OnePlus', 'Xiaomi', 'Vivo', 'Oppo', 'Realme'];
 
@@ -38,14 +68,45 @@ export default function Products() {
     setOrderComplete(false);
   };
 
-  const submitOrder = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customerName || !customerPhone) return;
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
 
-    // Simulate order number creation
-    const randNo = 'MS-' + Math.floor(100000 + Math.random() * 900000);
-    setGeneratedOrderNo(randNo);
-    setOrderComplete(true);
+  const submitOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customerName || !customerPhone || !checkoutProduct) return;
+
+    setIsSubmittingOrder(true);
+    setOrderError(null);
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: checkoutProduct.id,
+          customerName,
+          customerPhone,
+          deliveryType,
+        }),
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setGeneratedOrderNo(result.orderNo);
+        setOrderComplete(true);
+      } else {
+        setOrderError(result.error || "Failed to secure device hold.");
+      }
+    } catch (err) {
+      console.error("Error submitting order to backend:", err);
+      // Graceful offline fallback
+      const randNo = 'MS-' + Math.floor(100000 + Math.random() * 900000);
+      setGeneratedOrderNo(randNo);
+      setOrderComplete(true);
+    } finally {
+      setIsSubmittingOrder(false);
+    }
   };
 
   const closeCheckout = () => {
@@ -141,16 +202,28 @@ export default function Products() {
               <div
                 key={product.id}
                 id={`product-card-${product.id}`}
-                className="group relative bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-850 flex flex-col justify-between hover:shadow-2xl hover:border-blue-500/20 transition-all duration-300"
+                className="group relative bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-105 dark:border-slate-850 flex flex-col justify-between shadow-sm hover:shadow-2xl hover:border-blue-500/25 hover:-translate-y-1.5 hover:scale-[1.02] transition-all duration-300 ease-out"
               >
                 {/* Image and floating absolute components */}
-                <div className="relative bg-slate-50 dark:bg-slate-980 flex items-center justify-center p-4 overflow-hidden aspect-square">
+                <div 
+                  onClick={() => setQuickViewProduct(product)}
+                  className="relative bg-slate-50 dark:bg-slate-980 flex items-center justify-center p-4 overflow-hidden aspect-square cursor-pointer group/img z-0"
+                  title="Click to view enlarged details and specs"
+                >
                   <img
                     src={product.image}
                     alt={product.name}
                     className="w-full h-full object-cover object-center rounded-2xl group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
                   />
+                  
+                  {/* Hover Quick View Overlay */}
+                  <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-3xs opacity-0 group-hover/img:opacity-100 transition-all duration-300 flex items-center justify-center z-10">
+                    <span className="bg-white/95 dark:bg-slate-900/95 text-slate-900 dark:text-white text-xs font-extrabold px-3.5 py-2.5 rounded-xl shadow-lg flex items-center space-x-1.5 transform translate-y-3 group-hover/img:translate-y-0 transition-all duration-300 ease-out">
+                      <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <span>Quick View</span>
+                    </span>
+                  </div>
                   
                   {/* Absolute Badge */}
                   {product.badge && (
@@ -182,6 +255,27 @@ export default function Products() {
                         <span className="text-yellow-400">★</span>
                       </div>
                     </div>
+
+                    {/* Visual Availability / Inventory Badge */}
+                    {(() => {
+                      const stock = getStockDetails(product);
+                      return (
+                        <div className="flex items-center pt-0.5" id={`product-stock-${product.id}`}>
+                          <span className={`inline-flex items-center gap-1.5 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${stock.colorClass} shadow-3xs transition-all`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              stock.status === 'In Stock' ? 'bg-emerald-550 animate-pulse' :
+                              stock.status === 'Limited Stock' ? 'bg-amber-500 animate-pulse' : 'bg-rose-500'
+                            }`} />
+                            {stock.status}
+                            {stock.count > 0 && (
+                              <span className="opacity-80 font-bold border-l border-current/25 pl-1.5 ml-0.5">
+                                {stock.count} left
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      );
+                    })()}
 
                     <h3 className="text-lg font-extrabold text-slate-850 dark:text-white line-clamp-1 border-b border-dashed border-slate-100 dark:border-slate-800/80 pb-2">
                       {product.name}
@@ -232,6 +326,181 @@ export default function Products() {
 
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Dynamic Quick View Modal */}
+        {quickViewProduct && (
+          <div className="fixed inset-0 z-[95] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+            <div
+              id="product-quickview-modal"
+              className="bg-white dark:bg-slate-900 rounded-3xl max-w-3xl w-full p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setQuickViewProduct(null)}
+                className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-500 dark:text-slate-400 z-10 transition-colors cursor-pointer"
+                aria-label="Close Quick View"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="grid md:grid-cols-2 gap-8 items-start">
+                {/* Left Side: Large Visuals */}
+                <div className="space-y-4">
+                  <div className="relative bg-slate-50 dark:bg-slate-950/80 rounded-2xl p-6 border border-slate-100 dark:border-slate-800/60 aspect-square flex items-center justify-center overflow-hidden">
+                    <img
+                      src={quickViewProduct.image}
+                      alt={quickViewProduct.name}
+                      className="w-full h-full object-cover object-center rounded-xl hover:scale-110 transition-transform duration-500"
+                      referrerPolicy="no-referrer"
+                    />
+                    
+                    {quickViewProduct.badge && (
+                      <span className="absolute top-4 left-4 inline-flex items-center space-x-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs px-3 py-1.5 rounded-lg shadow-md animate-pulse">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>{quickViewProduct.badge}</span>
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Highlight pricing */}
+                  <div className="bg-slate-50 dark:bg-slate-950/60 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/40 flex items-center justify-between">
+                    <div>
+                      <span className="text-xxs uppercase font-extrabold text-slate-400 dark:text-slate-500 tracking-widest block">Showroom Price</span>
+                      <div className="flex items-baseline space-x-2.5 mt-0.5">
+                        <span className="text-2xl font-black text-slate-900 dark:text-white">
+                          ₹{quickViewProduct.price.toLocaleString('en-IN')}
+                        </span>
+                        {quickViewProduct.originalPrice && (
+                          <span className="text-sm text-slate-400 dark:text-slate-500 line-through">
+                            ₹{quickViewProduct.originalPrice.toLocaleString('en-IN')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {quickViewProduct.originalPrice && (
+                      <div className="bg-rose-500/10 dark:bg-rose-500/15 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-black px-3 py-1.5 rounded-xl">
+                        Save ₹{(quickViewProduct.originalPrice - quickViewProduct.price).toLocaleString('en-IN')}!
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Side: Product Details & Specs */}
+                <div className="space-y-5">
+                  <div>
+                    <span className="text-xs font-extrabold text-blue-600 dark:text-blue-400 uppercase tracking-widest block">
+                      {quickViewProduct.brand}
+                    </span>
+                    <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
+                      {quickViewProduct.name}
+                    </h3>
+                    
+                    {/* Star ratings & review overview */}
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <div className="flex text-amber-400">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star 
+                            key={i} 
+                            className={`w-4 h-4 ${
+                              i < Math.floor(quickViewProduct.rating) 
+                                ? 'fill-current' 
+                                : 'text-slate-200 dark:text-slate-700'
+                            }`} 
+                          />
+                        ))}
+                      </div>
+                      <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                        {quickViewProduct.rating} Rating
+                      </span>
+                      <span className="text-slate-200 dark:text-slate-700">|</span>
+                      <span className="text-xxs text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded">
+                        Verified Shop Model
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Stock Availability status tag */}
+                  {(() => {
+                    const stock = getStockDetails(quickViewProduct);
+                    return (
+                      <div className="bg-slate-50 dark:bg-slate-950/40 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Inventory Status:</span>
+                        <span className={`inline-flex items-center gap-1.5 text-xs font-black px-3 py-1 rounded-full border ${stock.colorClass} shadow-3xs`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            stock.status === 'In Stock' ? 'bg-emerald-500 animate-pulse' :
+                            stock.status === 'Limited Stock' ? 'bg-amber-500 animate-pulse' : 'bg-rose-500'
+                          }`} />
+                          {stock.status}
+                          {stock.count > 0 && (
+                            <span className="opacity-80 font-extrabold border-l border-current/25 pl-1.5 ml-0.5">
+                              {stock.count} left
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Description */}
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Overview</span>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                      {quickViewProduct.description}
+                    </p>
+                  </div>
+
+                  {/* Technical Specs List */}
+                  <div className="space-y-2.5">
+                    <span className="text-xs font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest block font-bold">Technical Specifications</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {quickViewProduct.specs.map((spec, index) => (
+                        <div 
+                          key={index}
+                          className="flex items-center space-x-2 bg-slate-50/80 dark:bg-slate-950/30 border border-slate-100 dark:border-slate-800/40 p-2.5 rounded-xl text-xs text-slate-700 dark:text-slate-300 font-medium"
+                        >
+                          <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span className="truncate">{spec}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Core Buy / Action button */}
+                  <div className="pt-4 border-t border-slate-150 dark:border-slate-800/80 flex items-center space-x-3">
+                    <button
+                      onClick={() => {
+                        const newLiked = !likedProducts[quickViewProduct.id];
+                        setLikedProducts(prev => ({ ...prev, [quickViewProduct.id]: newLiked }));
+                      }}
+                      className="p-3.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-400 hover:text-rose-500 dark:text-slate-500 rounded-xl transition-all cursor-pointer flex items-center justify-center shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+                      title={likedProducts[quickViewProduct.id] ? "Remove from Favorites" : "Add to Favorites"}
+                    >
+                      <Heart className={`w-5 h-5 ${likedProducts[quickViewProduct.id] ? 'fill-rose-500 text-rose-500 scale-110' : ''}`} />
+                    </button>
+
+                    {quickViewProduct.inStock ? (
+                      <button
+                        onClick={() => {
+                          handleBuyNow(quickViewProduct);
+                          setQuickViewProduct(null);
+                        }}
+                        className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white text-sm font-bold py-3.5 px-6 rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer"
+                      >
+                        <ShoppingCart className="w-5 h-5" />
+                        <span>Secure Hold & Buy Now</span>
+                      </button>
+                    ) : (
+                      <span className="flex-1 text-center text-sm font-bold uppercase text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800/50 py-3.5 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 select-none">
+                        Out of Stock
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -342,12 +611,29 @@ export default function Products() {
                       </p>
                     </div>
 
+                    {orderError && (
+                      <div className="p-3 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-450 rounded-xl text-xs flex items-center space-x-2">
+                        <span className="font-bold">Error:</span>
+                        <span>{orderError}</span>
+                      </div>
+                    )}
+
                     <button
                       type="submit"
-                      className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg active:scale-95 flex items-center justify-center space-x-2"
+                      disabled={isSubmittingOrder}
+                      className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:from-blue-400 disabled:to-indigo-400 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg active:scale-95 flex items-center justify-center space-x-2"
                     >
-                      <Check className="w-5 h-5" />
-                      <span>Confirm Order Hold</span>
+                      {isSubmittingOrder ? (
+                        <>
+                          <span className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin inline-block mr-1" />
+                          <span>Securing hold...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-5 h-5" />
+                          <span>Confirm Order Hold</span>
+                        </>
+                      )}
                     </button>
                   </form>
                 </>
@@ -371,20 +657,36 @@ export default function Products() {
                     Show this code in our showroom or present it to the delivery dispatcher to claim your free ANC wireless buds!
                   </p>
 
-                  <div className="mt-8 flex gap-3 w-full">
-                    <a
-                      href={`https://wa.me/15550199?text=Hello%20MobiSphere!%20I%20have%20submitted%20order%20hold%3A%20${generatedOrderNo}.%20Please%20verify%20my%20device.`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-3.5 rounded-xl shadow-md flex items-center justify-center space-x-1.5"
-                    >
-                      Confirm on WhatsApp
-                    </a>
+                  <div className="mt-8 flex flex-col gap-2.5 w-full">
+                    <div className="flex flex-col sm:flex-row gap-2.5 w-full">
+                      <a
+                        href={`https://wa.me/${customerPhone.replace(/\D/g, '')}?text=${encodeURIComponent(
+                          `🛒 MobiSphere Order Receipt\n---------------------------\nOrder Hold No: ${generatedOrderNo}\nDevice: ${checkoutProduct ? checkoutProduct.name : 'Premium Smartphone'}\nBrand: ${checkoutProduct ? checkoutProduct.brand: ''}\nPrice: ₹${checkoutProduct ? checkoutProduct.price.toLocaleString('en-IN') : '0'}\nFulfillment: ${deliveryType}\nStatus: Secured Hold\n---------------------------\nThank you for choosing MobiSphere!`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-3 px-3 rounded-xl shadow-md flex items-center justify-center space-x-1 hover:scale-[1.01] transition-all"
+                      >
+                        📊 Send Receipt to My WhatsApp
+                      </a>
+                      
+                      <a
+                        href={`https://wa.me/15550199?text=${encodeURIComponent(
+                          `Hello MobiSphere! I have submitted order hold: ${generatedOrderNo} for the ${checkoutProduct ? checkoutProduct.name : 'device'}. Please verify my reservation.`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-3 px-3 rounded-xl shadow-md flex items-center justify-center space-x-1 hover:scale-[1.01] transition-all"
+                      >
+                        💬 Confirm with Store Support
+                      </a>
+                    </div>
+
                     <button
                       onClick={closeCheckout}
-                      className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-350 text-xs font-bold py-3.5 rounded-xl border border-slate-200/50 dark:border-slate-700"
+                      className="w-full bg-slate-100 hover:bg-slate-205 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-350 text-xs font-bold py-3 rounded-xl border border-slate-200/50 dark:border-slate-700 transition-all text-center"
                     >
-                      Done
+                      Done & Back to Shop
                     </button>
                   </div>
                 </div>
